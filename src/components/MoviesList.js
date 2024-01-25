@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {fallbackMoviePoster, image185} from '../api/moviesDb';
 
 var {width, height} = Dimensions.get('window');
 
 const MoviesList = ({title, data, hideSeeAll}) => {
-  let movieName = 'ant man the wasip';
   const navigation = useNavigation();
 
   return (
@@ -42,14 +42,16 @@ const MoviesList = ({title, data, hideSeeAll}) => {
               }}>
               <View className="space-y-1 mr-4">
                 <Image
-                  source={require('../assets/images/moviePoster2.png')}
+                  source={{
+                    uri: image185(item.poster_path) || fallbackMoviePoster,
+                  }}
                   style={{width: width * 0.33, height: height * 0.22}}
                   className="rounded-3xl"
                 />
                 <Text className="text-neutral-300 ml-1">
-                  {movieName.length > 14
-                    ? movieName.slice(0, 14) + '...'
-                    : movieName}
+                  {item.title.length > 14
+                    ? item.title.slice(0, 14) + '...'
+                    : item.title}
                 </Text>
               </View>
             </TouchableWithoutFeedback>

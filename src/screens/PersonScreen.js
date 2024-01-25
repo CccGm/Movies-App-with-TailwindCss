@@ -6,22 +6,50 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {ChevronLeftIcon} from 'react-native-heroicons/outline';
 import {HeartIcon} from 'react-native-heroicons/solid';
 import {useNavigation} from '@react-navigation/native';
 import MoviesList from '../components/MoviesList';
 import Loading from '../components/Loading';
+import {
+  fallbackPersonImage,
+  fetchPersonDetails,
+  fetchPersonMovies,
+  image342,
+} from '../api/moviesDb';
 
-const PersonScreen = () => {
+const PersonScreen = props => {
   var {width, height} = Dimensions.get('window');
   const ios = Platform.OS == 'ios';
   const verticalMargin = ios ? '' : 'my-3';
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [personMovies, setPersonMovies] = useState([1, 2, 3, 4, 5]);
+  const [personMovies, setPersonMovies] = useState([]);
+  const [person, setPerson] = useState({});
+
+  useEffect(() => {
+    setLoading(true);
+    getPersenDetails(props.route.params?.id);
+    getPersonMovies(props.route.params?.id);
+  }, []);
+
+  const getPersenDetails = async id => {
+    const data = await fetchPersonDetails(id);
+    if (data) {
+      setPerson(data);
+    }
+    setLoading(false);
+  };
+  const getPersonMovies = async id => {
+    const data = await fetchPersonMovies(id);
+    if (data) {
+      setPersonMovies(data.cast);
+    }
+    setLoading(false);
+  };
 
   return (
     <ScrollView
@@ -60,66 +88,56 @@ const PersonScreen = () => {
             }}>
             <View className="items-center rounded-full overflow-hidden h-72 w-72 border-2 border-neutral-600">
               <Image
-                source={require('../assets/images/castImage2.png')}
+                source={{
+                  uri: image342(person?.profile_path) || fallbackPersonImage,
+                }}
                 style={{height: height * 0.43, width: width * 0.74}}
               />
             </View>
           </View>
           <View className="mt-6">
             <Text className=" text-3xl text-white font-bold text-center">
-              Hello Gm
+              {person?.name}
             </Text>
             <Text className=" text-base text-neutral-500 text-center">
-              London uk
+              {person?.place_of_birth}
             </Text>
           </View>
           <View className="mx-3 p-4 mt-6 flex-row justify-between items-center bg-neutral-700 rounded-full">
             <View className="border-r-2 border-r-neutral-400 px-2 items-center">
               <Text className="text-white font-semibold">Gender</Text>
               <Text className="text-neutral-300 font-semibold text-sm">
-                Male
+                {person?.gender == 1 ? 'Female' : 'Male'}
               </Text>
             </View>
             <View className="border-r-2 border-r-neutral-400 px-2 items-center">
               <Text className="text-white font-semibold">Birthday</Text>
               <Text className="text-neutral-300 font-semibold text-sm">
-                15-8-23
+                {person?.birthday}
               </Text>
             </View>
             <View className="border-r-2 border-r-neutral-400 px-2 items-center">
               <Text className="text-white font-semibold">Know for </Text>
               <Text className="text-neutral-300 font-semibold text-sm">
-                Actiong
+                {person?.known_for_department}
               </Text>
             </View>
             <View className=" px-2 items-center">
               <Text className="text-white font-semibold">Popularity</Text>
               <Text className="text-neutral-300 font-semibold text-sm">
-                64.23
+                {person?.popularity} %
               </Text>
             </View>
           </View>
           <View className="my-6 mx-4 space-y-2">
             <Text className="text-white text-lg">Biography</Text>
             <Text className="text-neutral-400 tracking-wide">
-              {' '}
-              Hello there this is antmovie now that is start at 5 pm so be ready
-              to watch , now this movies size is 150 min so be resy to watch and
-              be prepaire your net Hello there this is antmovie now that is
-              start at 5 pm so be ready to watch , now this movies size is 150
-              min so be resy to watch and be prepaire your net Hello there this
-              is antmovie now that is start at 5 pm so be ready to watch , now
-              this movies size is 150 min so be resy to watch and be prepaire
-              your net Hello there this is antmovie now that is start at 5 pm so
-              be ready to watch , now this movies size is 150 min so be resy to
-              watch and be prepaire your net Hello there this is antmovie now
-              that is start at 5 pm so be ready to watch , now this movies size
-              is 150 min so be resy to watch and be prepaire your net
+              {person?.biography || 'N/A'}
             </Text>
           </View>
 
           {/* movies list */}
-          <MoviesList data={personMovies} title={'Movies'} />
+          <MoviesList data={personMovies} hideSeeAll={true} title={'Movies'} />
         </View>
       )}
     </ScrollView>

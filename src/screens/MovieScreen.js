@@ -16,22 +16,55 @@ import LinearGradient from 'react-native-linear-gradient';
 import CastList from '../components/CastList';
 import MoviesList from '../components/MoviesList';
 import Loading from '../components/Loading';
+import {
+  fallbackMoviePoster,
+  fetchMovieCredits,
+  fetchMovieDetails,
+  fetchSimilarMovies,
+  image500,
+} from '../api/moviesDb';
 
-const MovieScreen = ({props}) => {
+const MovieScreen = props => {
   var {width, height} = Dimensions.get('window');
   const ios = Platform.OS == 'ios';
   const topMargin = ios ? '' : 'mt-3';
-  const {item} = useRoute();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [cast, setCast] = useState([1, 2, 3, 4, 5]);
-  const [similer, setSimiler] = useState([1, 2, 3, 4, 5]);
-  let movieName = 'ant man the wasip : ant man the movies';
+  const [cast, setCast] = useState([]);
+  const [movies, setMovies] = useState({});
+  const [similer, setSimiler] = useState([]);
 
   useEffect(() => {
     //call api
-  }, [item]);
+    setLoading(true);
+    getMoviesDetails(props.route.params?.id);
+    getMoviesCredits(props.route.params?.id);
+    getSimilerMovies(props.route.params?.id);
+  }, [props.route.params.id]);
+
+  const getMoviesDetails = async id => {
+    const data = await fetchMovieDetails(id);
+
+    if (data) {
+      setMovies(data);
+    }
+    setLoading(false);
+  };
+  const getMoviesCredits = async id => {
+    const data = await fetchMovieCredits(id);
+
+    if (data && data.cast) {
+      setCast(data.cast);
+    }
+  };
+  const getSimilerMovies = async id => {
+    const data = await fetchSimilarMovies(id);
+
+    if (data && data.results) {
+      setSimiler(data.results);
+    }
+  };
 
   return (
     <ScrollView
@@ -60,9 +93,10 @@ const MovieScreen = ({props}) => {
         ) : (
           <View>
             <Image
-              source={require('../assets/images/moviePoster2.png')}
+              source={{
+                uri: image500(movies?.poster_path) || fallbackMoviePoster,
+              }}
               style={{width, height: height * 0.5}}
-              // className="rounded-3xl"
             />
             <LinearGradient
               colors={['transparent', 'rgba(23,23,23,0.8)', 'rgba(23,23,23,1)']}
@@ -75,46 +109,51 @@ const MovieScreen = ({props}) => {
         )}
       </View>
 
+      {/* {"adult": false, "backdrop_path": "/yOm993lsJyPmBodlYjgpPwBjXP9.jpg", "genre_ids": [35, 10751, 14], "id": 787699, "media_type": "movie", "original_language": "en", "original_title": "Wonka", "overview": "Willy Wonka – chock-full of ideas and determined to change the world one delectable bite at a time – is proof that the best things in life begin with a dream, and if you’re lucky enough to meet Willy Wonka, anything is possible.", "popularity": 3221.716, "poster_path": "/qhb1qOilapbapxWQn9jtRCMwXJF.jpg", "release_date": "2023-12-06", "title": "Wonka", "video": false, "vote_average": 7.183, "vote_count": 1357} */}
+
       {/* movies Details */}
 
       <View style={{marginTop: -(height * 0.09)}} className="space-y-3">
         {/* title */}
         <Text className="text-white text-center text-3xl font-bold tracking-wider">
-          {movieName}
+          {movies?.title}
         </Text>
 
         {/* ststus , release , runtime */}
-        <Text className="text-neutral-400 font-semibold text-base text-center">
-          Released . 2020 .170 min
-        </Text>
+        {movies?.id ? (
+          <Text className="text-neutral-400 font-semibold text-base text-center">
+            {movies?.status} . {movies?.release_date?.split('-')[0]} .
+            {movies?.runtime} min
+          </Text>
+        ) : null}
 
         {/* gemres  */}
         <View className="flex-row justify-center mx-4 space-x-2">
+          {movies?.genres?.map((geners, index) => {
+            let showDot = index + 1 != movies.genres.length;
+            return (
+              <Text
+                key={index}
+                className="text-neutral-400 font-semibold text-base text-center">
+                {geners?.name}
+                {showDot ? '.' : null}
+              </Text>
+            );
+          })}
           <Text className="text-neutral-400 font-semibold text-base text-center">
             Action .
           </Text>
-          <Text className="text-neutral-400 font-semibold text-base text-center">
+          {/* <Text className="text-neutral-400 font-semibold text-base text-center">
             Thrile .
           </Text>
           <Text className="text-neutral-400 font-semibold text-base text-center">
             Comady
-          </Text>
+          </Text> */}
         </View>
 
         {/* discription  */}
         <Text className="text-neutral-400 mx-4 tracking-wide">
-          Hello there this is antmovie now that is start at 5 pm so be ready to
-          watch , now this movies size is 150 min so be resy to watch and be
-          prepaire your net Hello there this is antmovie now that is start at 5
-          pm so be ready to watch , now this movies size is 150 min so be resy
-          to watch and be prepaire your net Hello there this is antmovie now
-          that is start at 5 pm so be ready to watch , now this movies size is
-          150 min so be resy to watch and be prepaire your net Hello there this
-          is antmovie now that is start at 5 pm so be ready to watch , now this
-          movies size is 150 min so be resy to watch and be prepaire your net
-          Hello there this is antmovie now that is start at 5 pm so be ready to
-          watch , now this movies size is 150 min so be resy to watch and be
-          prepaire your net
+          {movies?.overview}
         </Text>
       </View>
 

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   Bars3CenterLeftIcon,
@@ -16,15 +16,48 @@ import TrendingMovies from '../components/TrendingMovies';
 import MoviesList from '../components/MoviesList';
 import {useNavigation} from '@react-navigation/native';
 import Loading from '../components/Loading';
+import {
+  fetchTopRatedMovies,
+  fetchTrendingMovies,
+  fetchUpComingMovies,
+} from '../api/moviesDb';
 
 const ios = Platform.OS == 'ios';
 const HomeScreen = () => {
-  const [trending, setTrending] = useState([1, 2, 3]);
-  const [upcoming, setUpcoming] = useState([1, 2, 3, 4, 5, 6]);
-  const [topRated, setTopRated] = useState([1, 2, 3]);
-  const [loading, setLoading] = useState(false);
+  const [trending, setTrending] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [topRated, setTopRated] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    getTrendingMovies();
+    getUpComingMovies();
+    getTopRatedMovies();
+  }, []);
+
+  const getTrendingMovies = async () => {
+    const data = await fetchTrendingMovies();
+    if (data && data.results) {
+      setTrending(data.results);
+    }
+    setLoading(false);
+  };
+  const getUpComingMovies = async () => {
+    const data = await fetchUpComingMovies();
+    if (data && data.results) {
+      setUpcoming(data.results);
+    }
+    setLoading(false);
+  };
+  const getTopRatedMovies = async () => {
+    const data = await fetchTopRatedMovies();
+    if (data && data.results) {
+      setTopRated(data.results);
+    }
+    setLoading(false);
+  };
 
   return (
     <View className="flex-1 bg-neutral-800">
@@ -49,7 +82,7 @@ const HomeScreen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{paddingBottom: 10}}>
           {/* Trending Movies Crousel */}
-          <TrendingMovies data={trending} />
+          {trending.length > 0 && <TrendingMovies data={trending} />}
 
           {/* upcoming movies row */}
           <MoviesList title={'Upcoming'} data={upcoming} />
