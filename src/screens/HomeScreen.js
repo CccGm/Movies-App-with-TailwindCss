@@ -14,12 +14,17 @@ import {
 } from 'react-native-heroicons/outline';
 import TrendingMovies from '../components/TrendingMovies';
 import MoviesList from '../components/MoviesList';
+import {useNavigation} from '@react-navigation/native';
+import Loading from '../components/Loading';
 
 const ios = Platform.OS == 'ios';
 const HomeScreen = () => {
   const [trending, setTrending] = useState([1, 2, 3]);
   const [upcoming, setUpcoming] = useState([1, 2, 3, 4, 5, 6]);
   const [topRated, setTopRated] = useState([1, 2, 3]);
+  const [loading, setLoading] = useState(false);
+
+  const navigation = useNavigation();
 
   return (
     <View className="flex-1 bg-neutral-800">
@@ -31,23 +36,28 @@ const HomeScreen = () => {
         <View className="flex-row justify-between items-center mx-4 mt-3">
           <Bars3CenterLeftIcon size={30} strokeWidth={2} color={'white'} />
           <Text className="text-white text-3xl font-bold">Movies</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Search')}>
             <MagnifyingGlassIcon size={30} strokeWidth={2} color={'white'} />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 10}}>
-        {/* Trending Movies Crousel */}
-        <TrendingMovies data={trending} />
 
-        {/* upcoming movies row */}
-        <MoviesList title={'Upcoming'} data={upcoming} />
+      {loading ? (
+        <Loading />
+      ) : (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{paddingBottom: 10}}>
+          {/* Trending Movies Crousel */}
+          <TrendingMovies data={trending} />
 
-        {/* topRated movies row */}
-        <MoviesList title={'Top Rated'} data={topRated} />
-      </ScrollView>
+          {/* upcoming movies row */}
+          <MoviesList title={'Upcoming'} data={upcoming} />
+
+          {/* topRated movies row */}
+          <MoviesList title={'Top Rated'} data={topRated} />
+        </ScrollView>
+      )}
     </View>
   );
 };

@@ -15,6 +15,7 @@ import {HeartIcon} from 'react-native-heroicons/solid';
 import LinearGradient from 'react-native-linear-gradient';
 import CastList from '../components/CastList';
 import MoviesList from '../components/MoviesList';
+import Loading from '../components/Loading';
 
 const MovieScreen = ({props}) => {
   var {width, height} = Dimensions.get('window');
@@ -22,7 +23,7 @@ const MovieScreen = ({props}) => {
   const topMargin = ios ? '' : 'mt-3';
   const {item} = useRoute();
   const navigation = useNavigation();
-
+  const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [cast, setCast] = useState([1, 2, 3, 4, 5]);
   const [similer, setSimiler] = useState([1, 2, 3, 4, 5]);
@@ -54,21 +55,24 @@ const MovieScreen = ({props}) => {
             <HeartIcon size={35} color={isFavorite ? '#eab308' : 'white'} />
           </TouchableOpacity>
         </SafeAreaView>
-
-        <View>
-          <Image
-            source={require('../assets/images/moviePoster2.png')}
-            style={{width, height: height * 0.5}}
-            // className="rounded-3xl"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(23,23,23,0.8)', 'rgba(23,23,23,1)']}
-            style={{width, height: height * 0.4}}
-            start={{x: 0.5, y: 0}}
-            end={{x: 0.5, y: 1}}
-            className="absolute bottom-0"
-          />
-        </View>
+        {loading ? (
+          <Loading />
+        ) : (
+          <View>
+            <Image
+              source={require('../assets/images/moviePoster2.png')}
+              style={{width, height: height * 0.5}}
+              // className="rounded-3xl"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(23,23,23,0.8)', 'rgba(23,23,23,1)']}
+              style={{width, height: height * 0.4}}
+              start={{x: 0.5, y: 0}}
+              end={{x: 0.5, y: 1}}
+              className="absolute bottom-0"
+            />
+          </View>
+        )}
       </View>
 
       {/* movies Details */}
