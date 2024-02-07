@@ -158,9 +158,12 @@ const MovieScreen = props => {
       </View>
 
       {/* cast */}
-      <CastList navigation={navigation} cast={cast} />
+
+      {cast.length > 0 && <CastList navigation={navigation} cast={cast} />}
       {/* similer movies */}
-      <MoviesList title={'Similer Movies'} hideSeeAll={true} data={similer} />
+      {similer.length > 0 && (
+        <MoviesList title={'Similer Movies'} hideSeeAll={true} data={similer} />
+      )}
     </ScrollView>
   );
 };

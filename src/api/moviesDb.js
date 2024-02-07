@@ -11,7 +11,7 @@ const upcomingMovies_Endpoints = `${baseUrl}/movie/upcoming?api_key=${API_KEY}`;
 const topratedMovies_Endpoints = `${baseUrl}/movie/top_rated?api_key=${API_KEY}`;
 const searchMoviesEndpoint = `${baseUrl}/search/movie?api_key=${API_KEY}`;
 
-// movie
+// dynemic movies endpoint
 const movieDetailsEndpoint = id => `${baseUrl}/movie/${id}?api_key=${API_KEY}`;
 const movieCreditsEndpoint = id =>
   `${baseUrl}/movie/${id}/credits?api_key=${API_KEY}`;

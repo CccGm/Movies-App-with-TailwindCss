@@ -34,7 +34,7 @@ const PersonScreen = props => {
     setLoading(true);
     getPersenDetails(props.route.params?.id);
     getPersonMovies(props.route.params?.id);
-  }, []);
+  }, [props.route.params.id]);
 
   const getPersenDetails = async id => {
     const data = await fetchPersonDetails(id);
